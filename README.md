@@ -7,9 +7,8 @@ This project allows you to scaffold a workshop similar to those available at [cd
 ├── buildspec.yml                     <-- Build Spec used to build this project in CodeBuild
 ├── LICENSE.txt                       <-- License file
 ├── README.md                         <-- This instructions file
-├── templates                         <-- Templates for the workshop
-│   └── cloudformation                <-- Cloudformation templates for the workshop
-│       └── pipeline-template.yaml    <-- Cloudformation templates for CodePipeline
+├── website                           <-- Website configuration and deployment
+│   └── pipeline-template.yaml        <-- Cloudformation templates for CodePipeline
 ├── code                              <-- Source code for the workshop
 ├── content                           <-- Website content for the workshop
 └── deck                              <-- Presentation deck
@@ -17,7 +16,9 @@ This project allows you to scaffold a workshop similar to those available at [cd
 
 ## Requirements
 
-* [Fork this repository](https://help.github.com/articles/fork-a-repo/) and create a [GitHub personal OAuth access token](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/)
+1. [Fork this repository](https://help.github.com/articles/fork-a-repo/).
+
+2. Create a [GitHub personal OAuth access token](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/).
 
 ## Instructions
 
@@ -25,7 +26,7 @@ This project allows you to scaffold a workshop similar to those available at [cd
 
 ## Install the Sample Workshop in your AWS Account
 
-1. Complete the [Requirements](#requirements)
+1. Complete the [Requirements](#requirements).
 
 2. Click on the CloudFormation Launch link below that corresponds to the AWS Region in which you want to deploy the workshop.
 
@@ -36,7 +37,7 @@ This project allows you to scaffold a workshop similar to those available at [cd
 
 3. Once the CloudFormation **Quick create stack** page loads in your web browser, optionally update the **Stack name**.
 
-4. Provide values for the following **Parameters**:
+4. In the **Parameters** section, provide values for:
 
     | Parameter | Description |
     | --- | --- |
@@ -45,12 +46,16 @@ This project allows you to scaffold a workshop similar to those available at [cd
     | GitHubRepository | The name of forked GitHub Repository (defaults to **aws-workshop-sample**) |
     | GitHubUsername | The GitHub username of the forked GitHub Repository |
 
-5. Check the boxes for the following **Capabilities and transforms**:
+5. In the **Capabilities and transforms** section, check the following boxes:
 
-    * **I acknowledge that AWS CloudFormation might create IAM resources.**
-    * **I acknowledge that AWS CloudFormation might create IAM resources with custom names.**
-    * **I acknowledge that AWS CloudFormation might require the following capability: CAPABILITY_AUTO_EXPAND**
+    [ ] I acknowledge that AWS CloudFormation might create IAM resources.\
+    [ ] I acknowledge that AWS CloudFormation might create IAM resources with custom names.\
+    [ ] I acknowledge that AWS CloudFormation might require the following capability: CAPABILITY_AUTO_EXPAND
     
+    **If you don’t see a checkbox for CAPABILITY_AUTO_EXPAND, look for a message at the top of the page (image below) that lets you use the new UI".**
+
+    ![CloudFormation New UI Dialog](images/cloudformation-new-ui-dialog.png)
+
 6. Click the **Create stack** button.
 
 7. Once the CloudFormation Stack has been created, click on the **Options** tab and note the value for **WebsiteURL**.
