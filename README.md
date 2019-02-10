@@ -18,7 +18,7 @@ This project allows you to scaffold a workshop similar to those available at [cd
 
 1. [Fork this repository](https://help.github.com/articles/fork-a-repo/).
 
-2. Create a [GitHub personal OAuth access token](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/).
+2. Create a [GitHub personal OAuth access token](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/).  `repo` permissions are required.
 
 ## Instructions
 
@@ -50,9 +50,7 @@ This project allows you to scaffold a workshop similar to those available at [cd
 
 1. In the **Capabilities and transforms** section, check the following boxes:
 
-    [ ] I acknowledge that AWS CloudFormation might create IAM resources.\
-    [ ] I acknowledge that AWS CloudFormation might create IAM resources with custom names.\
-    [ ] I acknowledge that AWS CloudFormation might require the following capability: CAPABILITY_AUTO_EXPAND
+    ![CloudFormation Capabilities](images/cloudformation-capabilities.png)
 
 1. If you don’t see a checkbox for CAPABILITY_AUTO_EXPAND, look for a message at the top of the page (image below) and click on the link to **Try it out now and provide us feedback.** to use the new interface.
 
