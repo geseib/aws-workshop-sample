@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  WorkshopName:
+    Type: String
+
+  ParentZone:
+    Type: String
+    Default: aws.seibtribe.com
+
+Outputs:
+  WorkshopDNS:
+    Value:
+      !Join [
+        "",
+        [
+          !Ref WorkshopName,
+          ".",
+          !Ref ParnetZone,
+          " Nameservers: ",
+          !Select [0, !GetAtt WorkshopDNSZone.NameServers],
+          " ",
+          !Select [1, !GetAtt WorkshopDNSZone.NameServers],
+          " ",
+          !Select [2, !GetAtt WorkshopDNSZone.NameServers],
+          " ",
+          !Select [3, !GetAtt WorkshopDNSZone.NameServers],
+        ],
+      ]
+    Export:
+      Name: !Sub "${WorkshopName}-NSRecord"
+
+Resources:
+  WorkshopDNSZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      HostedZoneConfig:
+        Comment: !Join ["", ["Hosted zone for ", !Ref "WorkshopName"]]
+      Name: !Join [".", [Ref: WorkshopName, Ref: ParentZone]]
+      HostedZoneTags:
+        - Key: Workshop
+          Value: !Ref WorkshopName
