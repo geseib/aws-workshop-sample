@@ -18,6 +18,18 @@ Parameters:
 Outputs:
   WebsiteURL:
     Value: !GetAtt WebsiteBucket.WebsiteURL
+    Export:
+      Name: !Sub "${GitHubRepository}-WebURL"
+
+  WebsiteARN:
+    Value: !GetAtt WebsiteBucket.Arn
+    Export:
+      Name: !Sub "${GitHubRepository}-WebARN"
+
+  WebsiteBucket:
+    Value: !Ref WebsiteBucket
+    Export:
+      Name: !Sub "${GitHubRepository}-WebBucket"
 
 Resources:
   WebsiteBucket:
@@ -25,6 +37,11 @@ Resources:
     Properties:
       WebsiteConfiguration:
         IndexDocument: index.html
+
+  CodeBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${AWS::StackName}-code"
 
   ArtifactStore:
     Type: AWS::S3::Bucket
