@@ -81,10 +81,8 @@ Resources:
               CanonicalUser:
                 Fn::GetAtt: [CloudFrontOriginIdentity, S3CanonicalUserId]
             Action: "s3:GetObject"
-            Resource: 
-            !Join [
-              "",
-            [Fn::ImportValue !Sub "${WorkshopName}-WebARN", /*"]]
+            Resource:
+              !Join ["", [!ImportValue "!Sub '${WorkshopName}-WebARN'", "/*"]]
 
   WebsiteCloudfront:
     Type: AWS::CloudFront::Distribution
@@ -97,7 +95,10 @@ Resources:
           - DomainName:
               !Join [
                 "",
-                [Fn::ImportValue !Sub "${WorkshopName}-WebBucket", ".s3.amazonaws.com"],
+                [
+                  !ImportValue "!Sub '${WorkshopName}-WebBucket'",
+                  '.s3.amazonaws.com"',
+                ],
               ]
             Id: webpage
             S3OriginConfig:
