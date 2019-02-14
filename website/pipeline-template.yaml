@@ -1,24 +1,24 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
   GitHubUsername:
     Type: String
-    
+
   GitHubOAuthToken:
     Type: String
     NoEcho: true
-    
+
   GitHubRepository:
     Type: String
-    
+
   GitHubBranch:
     Type: String
 
 Outputs:
   WebsiteURL:
     Value: !GetAtt WebsiteBucket.WebsiteURL
-    
+
 Resources:
   WebsiteBucket:
     Type: AWS::S3::Bucket
@@ -28,7 +28,7 @@ Resources:
 
   ArtifactStore:
     Type: AWS::S3::Bucket
-    
+
   CodePipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
@@ -48,10 +48,10 @@ Resources:
               OutputArtifacts:
                 - Name: SourceArtifact
               Configuration:
-                  Owner: !Ref GitHubUsername
-                  OAuthToken: !Ref GitHubOAuthToken
-                  Repo: !Ref GitHubRepository
-                  Branch: !Ref GitHubBranch
+                Owner: !Ref GitHubUsername
+                OAuthToken: !Ref GitHubOAuthToken
+                Repo: !Ref GitHubRepository
+                Branch: !Ref GitHubBranch
         - Name: Build
           Actions:
             - Name: Build
@@ -105,7 +105,7 @@ Resources:
         ImagePullCredentialsType: CODEBUILD
       Source:
         Type: CODEPIPELINE
-    
+
   CodePipelineS3ObjectsPublicRead:
     Type: AWS::Serverless::Application
     Properties:
@@ -114,39 +114,39 @@ Resources:
         SemanticVersion: 0.0.1
       Parameters:
         S3BucketParameter: !Ref WebsiteBucket
-        
+
   CodePipelineServiceRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
         Version: 2012-10-17
-        Statement: 
+        Statement:
           - Effect: Allow
-            Principal: 
+            Principal:
               Service: "codepipeline.amazonaws.com"
             Action: "sts:AssumeRole"
-      Policies: 
+      Policies:
         - PolicyName: CodePipeline
-          PolicyDocument: 
-            Version: "2012-10-17"          
-            Statement: 
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
               - Effect: Allow
-                Action: 
+                Action:
                   - "s3:*"
                 Resource: "*"
               - Effect: Allow
-                Action: 
+                Action:
                   - "s3:GetObject"
                   - "s3:GetObjectVersion"
                   - "s3:GetBucketVersioning"
                 Resource: "*"
               - Effect: Allow
-                Action: 
+                Action:
                   - "s3:PutObject"
-                Resource: 
+                Resource:
                   - !GetAtt ArtifactStore.Arn
               - Effect: Allow
-                Action: 
+                Action:
                   - "cloudformation:GetTemplate"
                   - "cloudformation:DescribeStackResource"
                   - "cloudformation:DescribeStackResources"
@@ -156,43 +156,43 @@ Resources:
                   - "sns:ListSubscriptionsByTopic"
                 Resource: "*"
               - Effect: Allow
-                Action: 
+                Action:
                   - "lambda:invokefunction"
                   - "lambda:listfunctions"
                 Resource: "*"
               - Effect: Allow
-                Action: 
+                Action:
                   - "codebuild:BatchGetBuilds"
                   - "codebuild:StartBuild"
                 Resource: "*"
-                
+
   CodeBuildServiceRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
         Version: 2012-10-17
-        Statement: 
+        Statement:
           - Effect: Allow
-            Principal: 
+            Principal:
               Service: "codebuild.amazonaws.com"
             Action: "sts:AssumeRole"
-      Policies: 
+      Policies:
         - PolicyName: CodeBuild
           PolicyDocument:
-            Version: "2012-10-17"          
-            Statement: 
+            Version: "2012-10-17"
+            Statement:
               - Effect: Allow
-                Action: 
+                Action:
                   - "logs:CreateLogGroup"
                   - "logs:CreateLogStream"
                   - "logs:PutLogEvents"
                 Resource: "*"
               - Effect: Allow
-                Action: 
+                Action:
                   - "s3:GetObject"
                   - "s3:GetObjectVersion"
                 Resource: "*"
               - Effect: Allow
-                Action: 
+                Action:
                   - "s3:PutObject"
                 Resource: "*"
