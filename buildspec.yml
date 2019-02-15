@@ -12,7 +12,13 @@ phases:
       - hugo --source workshop --destination ../public --quiet
       
 artifacts:
-  base-directory: public
   files:
-    - '**/*'
+    - 'public/**/*'
   name: website-$(date +%Y-%m-%d)
+
+  secondary-artifacts:
+    codeartifact:
+      files:
+        - 'code/**.*'
+      discard-paths: yes
+
