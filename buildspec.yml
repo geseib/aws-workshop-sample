@@ -13,14 +13,14 @@ phases:
       
 artifacts:
   files:
-    - 'public/**.*'
+    - 'public/**/*'
   secondary-artifacts:
     WebsiteArtifact:
       base-directory: public
       files:
-        - '**.*'
+        - '**/*'
       name: website-$(date +%Y-%m-%d)
     CodeArtifact:
       base-directory: code
       files:
-        - '**.*'
+        - '**/*'
