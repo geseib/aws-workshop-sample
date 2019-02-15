@@ -15,12 +15,11 @@ artifacts:
   files:
     - 'public/**.*'
   secondary-artifacts:
-    codeartifact:
-      files:
-        - 'code/**.*'
-      discard-paths: yes
-  secondary-artifacts:
     BuildArtifact:
       files:
         - 'public/**.*'
       name: website-$(date +%Y-%m-%d)
+    codeartifact:
+      files:
+        - 'code/**.*'
+      discard-paths: yes
