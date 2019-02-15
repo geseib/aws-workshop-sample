@@ -1,6 +1,9 @@
 AWSTemplateFormatVersion: "2010-09-09"
 
 Parameters:
+  ParentStack:
+    Type: String
+
   WorkshopName:
     Type: String
 
@@ -72,7 +75,7 @@ Resources:
     Type: AWS::S3::BucketPolicy
     Properties:
       Bucket:
-        Fn::ImportValue: !Sub "${WorkshopName}-WebBucket"
+        Fn::ImportValue: !Sub "${ParentStack}-WebBucket"
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -84,7 +87,7 @@ Resources:
             Resource:
               !Join [
                 "",
-                ["Fn::ImportValue": !Sub "${WorkshopName}-WebARN", "/*"],
+                ["Fn::ImportValue": !Sub "${ParentStack}-WebARN", "/*"],
               ]
 
   WebsiteCloudfront:
@@ -99,7 +102,7 @@ Resources:
               !Join [
                 "",
                 [
-                  "Fn::ImportValue": !Sub "${WorkshopName}-WebBucket",
+                  "Fn::ImportValue": !Sub "${ParentStack}-WebBucket",
                   ".s3.amazonaws.com",
                 ],
               ]

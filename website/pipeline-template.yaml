@@ -19,17 +19,17 @@ Outputs:
   WebsiteURL:
     Value: !GetAtt WebsiteBucket.WebsiteURL
     Export:
-      Name: !Sub "${GitHubRepository}-WebURL"
+      Name: !Sub "${AWS:StackName}-WebURL"
 
   WebsiteARN:
     Value: !GetAtt WebsiteBucket.Arn
     Export:
-      Name: !Sub "${GitHubRepository}-WebARN"
+      Name: !Sub "${AWS::StackName}-WebARN"
 
   WebsiteBucket:
     Value: !Ref WebsiteBucket
     Export:
-      Name: !Sub "${GitHubRepository}-WebBucket"
+      Name: !Sub "${AWS::StackName}-WebBucket"
 
 Resources:
   WebsiteBucket:
