@@ -40,7 +40,6 @@ Resources:
 
   CodeBucket:
     Type: AWS::S3::Bucket
-    Properties:
 
   ArtifactStore:
     Type: AWS::S3::Bucket
