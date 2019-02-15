@@ -19,7 +19,7 @@ artifacts:
       files:
         - 'public/**.*'
       name: website-$(date +%Y-%m-%d)
-    codeartifact:
+    CodeArtifact:
       files:
         - 'code/**.*'
       discard-paths: yes

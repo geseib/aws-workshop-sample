@@ -81,6 +81,7 @@ Resources:
                 - Name: SourceArtifact
               OutputArtifacts:
                 - Name: BuildArtifact
+                - Name: CodeArtifact
               Configuration:
                 ProjectName: !Ref CodeBuildProject
         - Name: Deploy
@@ -97,6 +98,19 @@ Resources:
                 Extract: true
                 BucketName: !Ref WebsiteBucket
               RunOrder: 1
+            - Name: deploy-code-to-s3
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: S3
+                Version: 1
+              InputArtifacts:
+                - Name: CodeArtifact
+              Configuration:
+                Extract: true
+                BucketName: !Ref CodeBucket
+              RunOrder: 1
+
             - Name: update-s3-public-acl
               ActionTypeId:
                 Category: Invoke
