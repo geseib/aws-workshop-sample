@@ -152,7 +152,7 @@ Resources:
     Properties:
       Location:
         ApplicationId: arn:aws:serverlessrepo:us-east-1:511976418858:applications/codepipeline-s3-objects-public-read-multi-buildartifact
-        SemanticVersion: 0.0.1
+        SemanticVersion: 0.0.2
       Parameters:
         S3BucketParameter: !Ref WebsiteBucket
         BuildArtifactParameter: WebsiteArtifact
@@ -162,7 +162,7 @@ Resources:
     Properties:
       Location:
         ApplicationId: arn:aws:serverlessrepo:us-east-1:511976418858:applications/codepipeline-s3-objects-public-read-multi-buildartifact
-        SemanticVersion: 0.0.1
+        SemanticVersion: 0.0.2
       Parameters:
         S3BucketParameter: !Ref CodeBucket
         BuildArtifactParameter: CodeArtifact
