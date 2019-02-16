@@ -151,20 +151,21 @@ Resources:
     Type: AWS::Serverless::Application
     Properties:
       Location:
-        ApplicationId: arn:aws:serverlessrepo:us-east-1:068896461592:applications/codepipeline-s3-objects-public-read
+        ApplicationId: arn:aws:serverlessrepo:us-east-1:511976418858:applications/codepipeline-s3-objects-public-read-multi-buildartifact
         SemanticVersion: 0.0.1
       Parameters:
         S3BucketParameter: !Ref WebsiteBucket
+        BuildArtifactParameter: WebsiteArtifact
 
   CodePipelineCodeS3ObjectsPublicRead:
     Type: AWS::Serverless::Application
     Properties:
       Location:
-        ApplicationId: arn:aws:serverlessrepo:us-east-1:068896461592:applications/codepipeline-s3-objects-public-read
+        ApplicationId: arn:aws:serverlessrepo:us-east-1:511976418858:applications/codepipeline-s3-objects-public-read-multi-buildartifact
         SemanticVersion: 0.0.1
       Parameters:
         S3BucketParameter: !Ref CodeBucket
-
+        BuildArtifactParameter: CodeArtifact
   CodePipelineServiceRole:
     Type: AWS::IAM::Role
     Properties:
