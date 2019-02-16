@@ -31,6 +31,11 @@ Outputs:
     Export:
       Name: !Sub "${AWS::StackName}-WebBucket"
 
+  CodeURL:
+    Value: !Sub "https://s3.amazonaws.com/${CodeBucket}"
+    Export:
+      Name: !Sub "${AWS::StackName}-CodeURL"
+
 Resources:
   WebsiteBucket:
     Type: AWS::S3::Bucket
@@ -144,6 +149,9 @@ Resources:
         ComputeType: BUILD_GENERAL1_SMALL
         Image: "aws/codebuild/python:3.7.1"
         ImagePullCredentialsType: CODEBUILD
+        EnvironmentVariables:
+         - Name: HUGO_S3_CFN_BUCKET
+           Value: !Sub "${CodeBucket}" 
       Source:
         Type: CODEPIPELINE
 
