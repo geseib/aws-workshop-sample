@@ -1,6 +1,9 @@
 AWSTemplateFormatVersion: "2010-09-09"
 
 Parameters:
+  ParentStack:
+    Type: String
+
   WorkshopName:
     Type: String
 
@@ -72,7 +75,7 @@ Resources:
     Type: AWS::S3::BucketPolicy
     Properties:
       Bucket:
-        Fn::ImportValue: !Sub "${WorkshopName}-WebBucket"
+        Fn::ImportValue: !Sub "${ParentStack}-WebBucket"
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -81,7 +84,11 @@ Resources:
               CanonicalUser:
                 Fn::GetAtt: [CloudFrontOriginIdentity, S3CanonicalUserId]
             Action: "s3:GetObject"
-            Resource: "arn:aws:s3:::testwork5-websitebucket-otgqai9c0vd4/*"
+            Resource:
+              !Join [
+                "",
+                ["Fn::ImportValue": !Sub "${ParentStack}-WebARN", "/*"],
+              ]
 
   WebsiteCloudfront:
     Type: AWS::CloudFront::Distribution
@@ -94,7 +101,10 @@ Resources:
           - DomainName:
               !Join [
                 "",
-                ["testwork5-websitebucket-otgqai9c0vd4", ".s3.amazonaws.com"],
+                [
+                  "Fn::ImportValue": !Sub "${ParentStack}-WebBucket",
+                  ".s3.amazonaws.com",
+                ],
               ]
             Id: webpage
             S3OriginConfig:

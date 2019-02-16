@@ -19,17 +19,22 @@ Outputs:
   WebsiteURL:
     Value: !GetAtt WebsiteBucket.WebsiteURL
     Export:
-      Name: !Sub "${GitHubRepository}-WebURL"
+      Name: !Sub "${AWS::StackName}-WebURL"
 
   WebsiteARN:
     Value: !GetAtt WebsiteBucket.Arn
     Export:
-      Name: !Sub "${GitHubRepository}-WebARN"
+      Name: !Sub "${AWS::StackName}-WebARN"
 
   WebsiteBucket:
     Value: !Ref WebsiteBucket
     Export:
-      Name: !Sub "${GitHubRepository}-WebBucket"
+      Name: !Sub "${AWS::StackName}-WebBucket"
+
+  CodeURL:
+    Value: !Sub "https://s3.amazonaws.com/${CodeBucket}"
+    Export:
+      Name: !Sub "${AWS::StackName}-CodeURL"
 
 Resources:
   WebsiteBucket:
@@ -40,8 +45,6 @@ Resources:
 
   CodeBucket:
     Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Sub "${AWS::StackName}-code"
 
   ArtifactStore:
     Type: AWS::S3::Bucket
@@ -80,34 +83,60 @@ Resources:
               InputArtifacts:
                 - Name: SourceArtifact
               OutputArtifacts:
-                - Name: BuildArtifact
+                - Name: WebsiteArtifact
+                - Name: CodeArtifact
               Configuration:
                 ProjectName: !Ref CodeBuildProject
         - Name: Deploy
           Actions:
-            - Name: deploy-to-s3
+            - Name: deploy-website-to-s3
               ActionTypeId:
                 Category: Deploy
                 Owner: AWS
                 Provider: S3
                 Version: 1
               InputArtifacts:
-                - Name: BuildArtifact
+                - Name: WebsiteArtifact
               Configuration:
                 Extract: true
                 BucketName: !Ref WebsiteBucket
               RunOrder: 1
-            - Name: update-s3-public-acl
+            - Name: deploy-code-to-s3
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: S3
+                Version: 1
+              InputArtifacts:
+                - Name: CodeArtifact
+              Configuration:
+                Extract: true
+                BucketName: !Ref CodeBucket
+              RunOrder: 1
+
+            - Name: update-web-s3-public-acl
               ActionTypeId:
                 Category: Invoke
                 Owner: AWS
                 Provider: Lambda
                 Version: 1
               InputArtifacts:
-                - Name: BuildArtifact
+                - Name: WebsiteArtifact
               Configuration:
-                FunctionName: !GetAtt CodePipelineS3ObjectsPublicRead.Outputs.PublicReadAclFunctionName
+                FunctionName: !GetAtt CodePipelineWebsiteS3ObjectsPublicRead.Outputs.PublicReadAclFunctionName
               RunOrder: 2
+            - Name: update-code-s3-public-acl
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Provider: Lambda
+                Version: 1
+              InputArtifacts:
+                - Name: CodeArtifact
+              Configuration:
+                FunctionName: !GetAtt CodePipelineCodeS3ObjectsPublicRead.Outputs.PublicReadAclFunctionName
+              RunOrder: 2
+
 
   CodeBuildProject:
     Type: AWS::CodeBuild::Project
@@ -120,18 +149,31 @@ Resources:
         ComputeType: BUILD_GENERAL1_SMALL
         Image: "aws/codebuild/python:3.7.1"
         ImagePullCredentialsType: CODEBUILD
+        EnvironmentVariables:
+         - Name: HUGO_S3_CFN_BUCKET
+           Value: !Sub "${CodeBucket}" 
       Source:
         Type: CODEPIPELINE
 
-  CodePipelineS3ObjectsPublicRead:
+  CodePipelineWebsiteS3ObjectsPublicRead:
     Type: AWS::Serverless::Application
     Properties:
       Location:
-        ApplicationId: arn:aws:serverlessrepo:us-east-1:068896461592:applications/codepipeline-s3-objects-public-read
-        SemanticVersion: 0.0.1
+        ApplicationId: arn:aws:serverlessrepo:us-east-1:511976418858:applications/codepipeline-s3-objects-public-read-multi-buildartifact
+        SemanticVersion: 0.0.2
       Parameters:
         S3BucketParameter: !Ref WebsiteBucket
+        BuildArtifactParameter: WebsiteArtifact
 
+  CodePipelineCodeS3ObjectsPublicRead:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location:
+        ApplicationId: arn:aws:serverlessrepo:us-east-1:511976418858:applications/codepipeline-s3-objects-public-read-multi-buildartifact
+        SemanticVersion: 0.0.2
+      Parameters:
+        S3BucketParameter: !Ref CodeBucket
+        BuildArtifactParameter: CodeArtifact
   CodePipelineServiceRole:
     Type: AWS::IAM::Role
     Properties:
