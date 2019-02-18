@@ -3,18 +3,17 @@ Description: Creates a ACM Certificate and automatically registers . Outputs the
 Parameters:
   ParentStack:
     Type: String
-    Default: awsworkshop
+    Default: shipit
 
 Resources:
   ACMCertificate:
     Type: Custom::ACMAutoValidate
     Properties:
-      ServiceToken:
-        Fn::ImportValue: !Sub "${ParentStack}-ACMValidateFunction"
-      zoneid: Z1F4VU2LB5GLRV
-      domainname: host.awsworkshop.com
+      ServiceToken: arn:aws:lambda:us-east-1:237289159912:function:shipit-ACMValidateFunction
+      zoneid: Z2L22WHBVG8SH2
+      domainname: "*.shipitnine.aws.seibtribe.com."
       additionalnames:
-        - www.awsworkshop.com
+        - "cdn.shipitnine.aws.seibtribe.com."
 
 Outputs:
   ACMCertificateARN:

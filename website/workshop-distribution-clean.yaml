@@ -11,6 +11,28 @@ Parameters:
     Type: String
     Default: aws.seibtribe.com
 
+Outputs:
+  WorkshopDNS:
+    Value:
+      !Join [
+        "",
+        [
+          !Ref WorkshopName,
+          ".",
+          !Ref ParentZone,
+          " Nameservers: ",
+          !Select [0, !GetAtt WorkshopDNSZone.NameServers],
+          ", ",
+          !Select [1, !GetAtt WorkshopDNSZone.NameServers],
+          ", ",
+          !Select [2, !GetAtt WorkshopDNSZone.NameServers],
+          ", ",
+          !Select [3, !GetAtt WorkshopDNSZone.NameServers],
+        ],
+      ]
+    Export:
+      Name: !Sub "${WorkshopName}-NSRecord"
+
 Resources:
   ACMValidateFunction:
     Type: AWS::Lambda::Function
@@ -60,6 +82,7 @@ Resources:
           PolicyName: !Sub "${ParentStack}-ACMandRoute53Access"
 
   ACMCertificate:
+    DependsOn: WorkshopDNSZone
     Type: Custom::ACMAutoValidate
     Properties:
       ServiceToken:
@@ -67,7 +90,7 @@ Resources:
           - ACMValidateFunction
           - Arn
       zoneid: !Ref WorkshopDNSZone
-      domainname: !Join [".", ["*", Ref: WorkshopName, Ref: ParentZone]]
+      domainname: !Join [".", ["cdn", Ref: WorkshopName, Ref: ParentZone]]
       additionalnames:
         - !Join [".", [Ref: WorkshopName, Ref: ParentZone]]
 
@@ -114,12 +137,6 @@ Resources:
       CloudFrontOriginAccessIdentityConfig:
         Comment: !Join ["", ["origin identity for", Ref: WorkshopName]]
 
-  WebsiteBucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      WebsiteConfiguration:
-        IndexDocument: index.html
-
   WebsitePolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -140,9 +157,8 @@ Resources:
               ]
 
   WebsiteCloudfront:
+    DependsOn: ACMCertificate
     Type: AWS::CloudFront::Distribution
-    DependsOn:
-      - WebsiteBucket
     Properties:
       DistributionConfig:
         Comment: Cloudfront Distribution pointing to S3 bucket
