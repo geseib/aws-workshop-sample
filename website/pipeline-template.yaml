@@ -137,7 +137,6 @@ Resources:
                 FunctionName: !GetAtt CodePipelineCodeS3ObjectsPublicRead.Outputs.PublicReadAclFunctionName
               RunOrder: 2
 
-
   CodeBuildProject:
     Type: AWS::CodeBuild::Project
     Properties:
@@ -150,8 +149,8 @@ Resources:
         Image: "aws/codebuild/python:3.7.1"
         ImagePullCredentialsType: CODEBUILD
         EnvironmentVariables:
-         - Name: HUGO_S3_CFN_BUCKET
-           Value: !Sub "${CodeBucket}" 
+          - Name: HUGO_S3_CFN_BUCKET
+            Value: !Sub "${CodeBucket}"
       Source:
         Type: CODEPIPELINE
 
@@ -159,8 +158,8 @@ Resources:
     Type: AWS::Serverless::Application
     Properties:
       Location:
-        ApplicationId: arn:aws:serverlessrepo:us-east-1:511976418858:applications/codepipeline-s3-objects-public-read-multi-buildartifact
-        SemanticVersion: 0.0.2
+        ApplicationId: arn:aws:serverlessrepo:us-east-1:068896461592:applications/codepipeline-s3-objects-public-read
+        SemanticVersion: 0.0.3
       Parameters:
         S3BucketParameter: !Ref WebsiteBucket
         BuildArtifactParameter: WebsiteArtifact
@@ -169,8 +168,8 @@ Resources:
     Type: AWS::Serverless::Application
     Properties:
       Location:
-        ApplicationId: arn:aws:serverlessrepo:us-east-1:511976418858:applications/codepipeline-s3-objects-public-read-multi-buildartifact
-        SemanticVersion: 0.0.2
+        ApplicationId: arn:aws:serverlessrepo:us-east-1:068896461592:applications/codepipeline-s3-objects-public-read
+        SemanticVersion: 0.0.3
       Parameters:
         S3BucketParameter: !Ref CodeBucket
         BuildArtifactParameter: CodeArtifact
