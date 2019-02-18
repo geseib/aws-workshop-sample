@@ -1,0 +1,22 @@
+Description: Creates a ACM Certificate and automatically registers . Outputs the ACM ARN.
+
+Parameters:
+  ParentStack:
+    Type: String
+    Default: awsworkshop
+
+Resources:
+  ACMCertificate:
+    Type: Custom::ACMAutoValidate
+    Properties:
+      ServiceToken:
+        Fn::ImportValue: !Sub "${ParentStack}-ACMValidateFunction"
+      zoneid: Z1F4VU2LB5GLRV
+      domainname: host.awsworkshop.com
+      additionalnames:
+        - www.awsworkshop.com
+
+Outputs:
+  ACMCertificateARN:
+    Description: ACM Certificate ARN
+    Value: !GetAtt ACMCertificate.Arn
