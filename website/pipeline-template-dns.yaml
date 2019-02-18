@@ -303,7 +303,7 @@ Resources:
       Code:
         S3Bucket: seibeast
         S3Key: ACMValidateFunction.zip
-      FunctionName: !Sub "${Workshop}-ACMValidateFunction"
+      FunctionName: !Sub "${WorkshopName}-ACMValidateFunction"
       Handler: acm_autovalidate.handler
       Role:
         Fn::GetAtt:
@@ -338,7 +338,7 @@ Resources:
                 Effect: Allow
                 Resource: "*"
             Version: "2012-10-17"
-          PolicyName: !Sub "${Workshop}-ACMandRoute53Access"
+          PolicyName: !Sub "${WorkshopName}-ACMandRoute53Access"
 
   # Create the DNS Zone
 
@@ -363,6 +363,6 @@ Resources:
           - ACMValidateFunction
           - Arn
       zoneid: !Ref WorkshopDNSZone
-      domainname: !Join [".", ["cdn", Ref: WorkshopName, Ref: ParentZone]]
+      domainname: !Join [".", ["www", Ref: WorkshopName, Ref: ParentZone]]
       additionalnames:
         - !Join [".", [Ref: WorkshopName, Ref: ParentZone]]

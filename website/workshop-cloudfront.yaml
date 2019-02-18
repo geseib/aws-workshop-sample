@@ -11,10 +11,8 @@ Parameters:
     Type: String
     Default: aws.seibtribe.com
 
-Outputs:
- 
 Resources:
- CDNDNS:
+  CDNDNS:
     Type: AWS::Route53::RecordSet
     Properties:
       Name: !Join ["", [www, ".", Ref: WorkshopName, ".", Ref: ParentZone, "."]]
@@ -34,7 +32,8 @@ Resources:
         - Name: !Join ["", [Ref: WorkshopName, ".", Ref: ParentZone, "."]]
           Type: A
           AliasTarget:
-            HostedZoneId: "Fn::ImportValue": !Sub "${ParentStack}-ZoneId"
+            HostedZoneId:
+              Fn::ImportValue: !Sub "${ParentStack}-ZoneId"
             DNSName:
               !Join [
                 "",
@@ -67,7 +66,6 @@ Resources:
               ]
 
   WebsiteCloudfront:
-    DependsOn: ACMCertificate
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
@@ -104,5 +102,6 @@ Resources:
           ViewerProtocolPolicy: redirect-to-https
         PriceClass: PriceClass_100
         ViewerCertificate:
-          AcmCertificateArn: "Fn::ImportValue": !Sub "${ParentStack}-ACMArn"
+          AcmCertificateArn:
+            Fn::ImportValue: !Sub "${ParentStack}-ACMArn"
           SslSupportMethod: sni-only
