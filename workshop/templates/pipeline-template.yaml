@@ -38,10 +38,10 @@ Outputs:
     Export:
       Name: !Sub "${AWS::StackName}-WebBucket"
 
-  CodeURL:
-    Value: !Sub "https://s3.amazonaws.com/${CodeBucket}"
+  ResourcesURL:
+    Value: !Sub "https://s3.amazonaws.com/${ResourcesBucket}"
     Export:
-      Name: !Sub "${AWS::StackName}-CodeURL"
+      Name: !Sub "${AWS::StackName}-ResourcesURL"
 
   WorkshopDNSZoneId:
     Value: !Ref WorkshopDNSZone
@@ -76,14 +76,14 @@ Outputs:
       Name: !Sub "${AWS::StackName}-ACMArn"
 
 Resources:
-  # Create Three S3 Buckets for the Website, Code to be used by Workshop participants, and the Code Pipeline Artifacts
+  # Create three S3 Buckets for the Website, Resources to be used by Workshop participants, and the Code Pipeline Artifacts
   WebsiteBucket:
     Type: AWS::S3::Bucket
     Properties:
       WebsiteConfiguration:
         IndexDocument: index.html
 
-  CodeBucket:
+  ResourcesBucket:
     Type: AWS::S3::Bucket
 
   ArtifactStore:
@@ -124,7 +124,7 @@ Resources:
                 - Name: SourceArtifact
               OutputArtifacts:
                 - Name: WebsiteArtifact
-                - Name: CodeArtifact
+                - Name: ResourcesArtifact
               Configuration:
                 ProjectName: !Ref CodeBuildProject
         - Name: Deploy
@@ -141,17 +141,17 @@ Resources:
                 Extract: true
                 BucketName: !Ref WebsiteBucket
               RunOrder: 1
-            - Name: deploy-code-to-s3
+            - Name: deploy-resources-to-s3
               ActionTypeId:
                 Category: Deploy
                 Owner: AWS
                 Provider: S3
                 Version: 1
               InputArtifacts:
-                - Name: CodeArtifact
+                - Name: ResourcesArtifact
               Configuration:
                 Extract: true
-                BucketName: !Ref CodeBucket
+                BucketName: !Ref ResourcesBucket
               RunOrder: 1
 
             - Name: update-web-s3-public-acl
@@ -165,16 +165,16 @@ Resources:
               Configuration:
                 FunctionName: !GetAtt CodePipelineWebsiteS3ObjectsPublicRead.Outputs.PublicReadAclFunctionName
               RunOrder: 2
-            - Name: update-code-s3-public-acl
+            - Name: update-resources-s3-public-acl
               ActionTypeId:
                 Category: Invoke
                 Owner: AWS
                 Provider: Lambda
                 Version: 1
               InputArtifacts:
-                - Name: CodeArtifact
+                - Name: ResourcesArtifact
               Configuration:
-                FunctionName: !GetAtt CodePipelineCodeS3ObjectsPublicRead.Outputs.PublicReadAclFunctionName
+                FunctionName: !GetAtt CodePipelineResourcesS3ObjectsPublicRead.Outputs.PublicReadAclFunctionName
               RunOrder: 2
 
   CodeBuildProject:
@@ -190,9 +190,10 @@ Resources:
         ImagePullCredentialsType: CODEBUILD
         EnvironmentVariables:
           - Name: HUGO_S3_CFN_BUCKET
-            Value: !Sub "${CodeBucket}"
+            Value: !Sub "${ResourcesBucket}"
       Source:
         Type: CODEPIPELINE
+        BuildSpec: workshop/buildspec.yml
 
   CodePipelineWebsiteS3ObjectsPublicRead:
     Type: AWS::Serverless::Application
@@ -204,15 +205,16 @@ Resources:
         S3BucketParameter: !Ref WebsiteBucket
         BuildArtifactParameter: WebsiteArtifact
 
-  CodePipelineCodeS3ObjectsPublicRead:
+  CodePipelineResourcesS3ObjectsPublicRead:
     Type: AWS::Serverless::Application
     Properties:
       Location:
         ApplicationId: arn:aws:serverlessrepo:us-east-1:068896461592:applications/codepipeline-s3-objects-public-read
         SemanticVersion: 0.0.3
       Parameters:
-        S3BucketParameter: !Ref CodeBucket
-        BuildArtifactParameter: CodeArtifact
+        S3BucketParameter: !Ref ResourcesBucket
+        BuildArtifactParameter: ResourcesArtifact
+
   CodePipelineServiceRole:
     Type: AWS::IAM::Role
     Properties:
