@@ -9,18 +9,17 @@ phases:
 
   build:
     commands:
-      - hugo --source workshop --destination ../public --quiet
+      - hugo --source website --destination ../public --quiet
       
 artifacts:
-  files:
-    - 'public/**/*'
   secondary-artifacts:
     WebsiteArtifact:
       base-directory: public
       files:
         - '**/*'
       name: website-$(date +%Y-%m-%d)
-    CodeArtifact:
-      base-directory: code
+    ResourcesArtifact:
+      base-directory: resources
       files:
         - '**/*'
+      name: resources-$(date +%Y-%m-%d)
