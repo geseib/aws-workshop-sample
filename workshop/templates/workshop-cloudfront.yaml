@@ -12,30 +12,10 @@ Parameters:
     Default: aws.seibtribe.com
 
 Resources:
-  WildACM:
-    Type: "AWS::CertificateManager::Certificate"
-    Properties:
-      DomainName: !Join [".", ["*", Ref: WorkshopName, Ref: ParentZone]]
-      SubjectAlternativeNames:
-        - !Join [".", [Ref: WorkshopName, Ref: ParentZone]]
-      Tags:
-        - Key: Workshop
-          Value: !Ref WorkshopName
-
-  WorkshopDNSZone:
-    Type: AWS::Route53::HostedZone
-    Properties:
-      HostedZoneConfig:
-        Comment: !Join ["", ["Hosted zone for ", !Ref "WorkshopName"]]
-      Name: !Join [".", [Ref: WorkshopName, Ref: ParentZone]]
-      HostedZoneTags:
-        - Key: Workshop
-          Value: !Ref WorkshopName
-
   CDNDNS:
     Type: AWS::Route53::RecordSet
     Properties:
-      Name: !Join ["", [cdn, ".", Ref: WorkshopName, ".", Ref: ParentZone, "."]]
+      Name: !Join ["", [www, ".", Ref: WorkshopName, ".", Ref: ParentZone, "."]]
       HostedZoneName: !Join ["", [Ref: WorkshopName, ".", Ref: ParentZone, "."]]
       Type: A
       AliasTarget:
@@ -52,11 +32,12 @@ Resources:
         - Name: !Join ["", [Ref: WorkshopName, ".", Ref: ParentZone, "."]]
           Type: A
           AliasTarget:
-            HostedZoneId: !Ref WorkshopDNSZone
+            HostedZoneId:
+              Fn::ImportValue: !Sub "${ParentStack}-ZoneId"
             DNSName:
               !Join [
                 "",
-                [cdn, ".", Ref: WorkshopName, ".", Ref: ParentZone, "."],
+                [www, ".", Ref: WorkshopName, ".", Ref: ParentZone, "."],
               ]
 
   CloudFrontOriginIdentity:
@@ -64,12 +45,6 @@ Resources:
     Properties:
       CloudFrontOriginAccessIdentityConfig:
         Comment: !Join ["", ["origin identity for", Ref: WorkshopName]]
-
-  WebsiteBucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      WebsiteConfiguration:
-        IndexDocument: index.html
 
   WebsitePolicy:
     Type: AWS::S3::BucketPolicy
@@ -92,8 +67,6 @@ Resources:
 
   WebsiteCloudfront:
     Type: AWS::CloudFront::Distribution
-    DependsOn:
-      - WebsiteBucket
     Properties:
       DistributionConfig:
         Comment: Cloudfront Distribution pointing to S3 bucket
@@ -113,7 +86,7 @@ Resources:
         HttpVersion: "http2"
         DefaultRootObject: index.html
         Aliases:
-          - !Join [".", [cdn, Ref: WorkshopName, Ref: ParentZone]]
+          - !Join [".", [www, Ref: WorkshopName, Ref: ParentZone]]
           - !Join [".", [Ref: WorkshopName, Ref: ParentZone]]
         DefaultCacheBehavior:
           AllowedMethods:
@@ -129,5 +102,6 @@ Resources:
           ViewerProtocolPolicy: redirect-to-https
         PriceClass: PriceClass_100
         ViewerCertificate:
-          AcmCertificateArn: !Ref WildACM
+          AcmCertificateArn:
+            Fn::ImportValue: !Sub "${ParentStack}-ACMArn"
           SslSupportMethod: sni-only
